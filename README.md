@@ -16,8 +16,9 @@ IMAGES_URL=http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/files/701_S
 wget -c $LABEL_MAP_URL
 
 wget -c $LABELS_URL
-unzip -d labels LabeledApproved_full.zip
+unzip -d train_labels LabeledApproved_full.zip
 
 wget -c $IMAGES_URL
-unzip -d inputs 701_StillsRaw_full.zip
+unzip 701_StillsRaw_full.zip
+mv 701_StillsRaw_full train_inputs
 ```
