@@ -79,7 +79,9 @@ label2id = {label:id for id, label in enumerate(id2label)}
 idcolormap = [label_colormap[label] for label in id2label]
 
 # Check nothing stupid happened with mappings
-assert set(colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
+assert set(label_colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
+
+
 
 
 # ==============================================================================
