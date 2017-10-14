@@ -22,3 +22,16 @@ wget -c $IMAGES_URL
 unzip 701_StillsRaw_full.zip
 mv 701_StillsRaw_full train_inputs
 ```
+## Sample Data
+Input images
+
+![sample of input images](sample_inputs.jpg)
+
+Label Images
+
+![Sample of label images](sample_labels.jpg)
+
+
+Labels overlayed on top of input images with opacity of 0.7.
+
+![Sample images of training data and labels](sample_overlayed.jpg)
