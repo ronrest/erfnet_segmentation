@@ -1,0 +1,3 @@
+*.pickle
+*.pyc
+__pycache__
