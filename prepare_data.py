@@ -1,3 +1,4 @@
+from __future__ import print_function, division, unicode_literals
 colormap = {
     "Animal": (64, 128, 64),
     "Archway": (192, 0, 128),
@@ -32,3 +33,46 @@ colormap = {
     "Void": (0, 0, 0),
     "Wall": (64, 192, 0),
 }
+
+
+id2label = [
+    'Void',
+    'Sky',
+    'Pedestrian',
+    'Child',
+    'Animal',
+    'Tree',
+    'VegetationMisc',
+    'CartLuggagePram',
+    'Bicyclist',
+    'MotorcycleScooter',
+    'Car',
+    'SUVPickupTruck',
+    'Truck_Bus',
+    'Train',
+    'OtherMoving',
+    'Road',
+    'RoadShoulder',
+    'Sidewalk',
+    'LaneMkgsDriv',
+    'LaneMkgsNonDriv',
+    'Bridge',
+    'Tunnel',
+    'Archway',
+    'ParkingBlock',
+    'TrafficLight',
+    'SignSymbol',
+    'Column_Pole',
+    'Fence',
+    'TrafficCone',
+    'Misc_Text',
+    'Wall',
+    'Building',
+]
+
+label2id = {label:id for id, label in enumerate(id2label)}
+
+# Check nothing stupid happened with mappings
+assert set(colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
+
+
