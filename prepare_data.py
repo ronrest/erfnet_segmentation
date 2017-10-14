@@ -1,4 +1,7 @@
 from __future__ import print_function, division, unicode_literals
+import glob
+import os
+
 colormap = {
     "Animal": (64, 128, 64),
     "Archway": (192, 0, 128),
