@@ -304,3 +304,41 @@ def load_image_and_seglabels(input_files, label_files, colormap, shape=(32,32), 
     return X, Y
 
 
+if __name__ == '__main__':
+    # SETTINGS
+    data_dir = "/path/to/camvid"
+    data_dir = "/home/ronny/TEMP/camvid/"
+    pickle_file = "data.pickle"
+    shape = [128, 128]
+    width, height = shape
+    n_channels = 3
+    label_chanel_axis=False # Create chanels axis for label images?
+
+    print("CREATING DATA")
+    print("- Getting list of files")
+    file_data = create_data_dict(data_dir, X_train_subdir="train_inputs", Y_train_subdir="train_labels")
+    n_samples = len(file_data["X_train"])
+
+    est_size = n_samples*width*height*(3+1)/(1024*1000)
+    print("- Estimated data size is {} MB (+ overhead)".format(est_size))
+
+    print("- Loading image files and converting to arrays")
+    data = {}
+    data["X_train"], data["Y_train"] = load_image_and_seglabels(
+        input_files=file_data["X_train"],
+        label_files=file_data["Y_train"],
+        colormap=idcolormap,
+        shape=shape,
+        n_channels=n_channels,
+        label_chanel_axis=label_chanel_axis)
+
+    # # Visualize the data
+    # from viz import viz_overlayed_segmentation_label
+    # gx = batch2grid(X, 5,5)
+    # gy = batch2grid(Y, 5,5)
+    # g = viz_overlayed_segmentation_label(gx, gy, colormap=idcolormap, alpha=0.7, saveto=None)
+    # g.show()
+
+    print("- Pickling the data to:", pickle_file)
+    obj2pickle(data, pickle_file)
+    print("- DONE!")
