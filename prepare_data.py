@@ -4,7 +4,7 @@ import os
 import PIL.Image
 import numpy as np
 
-colormap = {
+label_colormap = {
     "Animal": (64, 128, 64),
     "Archway": (192, 0, 128),
     "Bicyclist": (0, 128, 192),
@@ -76,6 +76,7 @@ id2label = [
 ]
 
 label2id = {label:id for id, label in enumerate(id2label)}
+idcolormap = [label_colormap[label] for label in id2label]
 
 # Check nothing stupid happened with mappings
 assert set(colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
