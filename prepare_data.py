@@ -1,6 +1,8 @@
 from __future__ import print_function, division, unicode_literals
 import glob
 import os
+import PIL.Image
+import numpy as np
 
 colormap = {
     "Animal": (64, 128, 64),
