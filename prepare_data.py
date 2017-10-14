@@ -304,6 +304,37 @@ def load_image_and_seglabels(input_files, label_files, colormap, shape=(32,32), 
     return X, Y
 
 
+# ==============================================================================
+#                                                                   PREPARE_DATA
+# ==============================================================================
+def prepare_data(data_file, valid_from_train=False, n_valid=1024, max_data=None, verbose=True):
+    data = pickle2obj(data_file)
+
+    # Create validation from train data
+    if valid_from_train:
+        data["X_valid"] = data["X_train"][:n_valid]
+        data["Y_valid"] = data["Y_train"][:n_valid]
+        data["X_train"] = data["X_train"][n_valid:]
+        data["Y_train"] = data["Y_train"][n_valid:]
+
+    if max_data:
+        data["X_train"] = data["X_train"][:max_data]
+        data["Y_train"] = data["Y_train"][:max_data]
+
+    if verbose:
+        # Print information about data
+        print("DATA SHAPES")
+        print("- X_valid: ", (data["X_valid"]).shape)
+        print("- Y_valid: ", (data["Y_valid"]).shape)
+        print("- X_train: ", (data["X_train"]).shape)
+        print("- Y_train: ", (data["Y_train"]).shape)
+        if "X_test" in data:
+            print("- X_test: ", (data["X_test"]).shape)
+            print("- Y_test: ", (data["Y_test"]).shape)
+
+    return data
+
+
 if __name__ == '__main__':
     # SETTINGS
     data_dir = "/path/to/camvid"
