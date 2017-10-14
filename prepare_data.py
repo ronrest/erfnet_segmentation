@@ -100,7 +100,7 @@ def create_file_lists(inputs_dir, labels_dir):
 # ==============================================================================
 #                                                               CREATE_DATA_DICT
 # ==============================================================================
-def create_data_dict(data_dir, X_train_subdir="train_labels", Y_train_subdir="train_inputs"):
+def create_data_dict(datadir, X_train_subdir="train_inputs", Y_train_subdir="train_labels"):
     data = {}
     data["X_train"], data["Y_train"] = create_file_lists(
         inputs_dir=os.path.join(datadir, X_train_subdir),
