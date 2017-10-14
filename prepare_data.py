@@ -3,6 +3,7 @@ import glob
 import os
 import PIL.Image
 import numpy as np
+import pickle
 
 label_colormap = {
     "Animal": (64, 128, 64),
@@ -82,6 +83,85 @@ idcolormap = [label_colormap[label] for label in id2label]
 assert set(label_colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
 
 
+# ==============================================================================
+#                                                                 MAYBE_MAKE_DIR
+# ==============================================================================
+def maybe_make_dir(path):
+    """ Checks if a directory path exists on the system, if it does not, then
+        it creates that directory (and any parent directories needed to
+        create that directory)
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+# ==============================================================================
+#                                                                     GET_PARDIR
+# ==============================================================================
+def get_pardir(file):
+    """ Given a file path, it returns the parent directory of that file. """
+    return os.path.dirname(file)
+
+
+# ==============================================================================
+#                                                              MAYBE_MAKE_PARDIR
+# ==============================================================================
+def maybe_make_pardir(file):
+    """ Takes a path to a file, and creates the necessary directory structure
+        on the system to ensure that the parent directory exists (if it does
+        not already exist)
+    """
+    pardir = os.path.dirname(file)
+    if pardir.strip() != "": # ensure pardir is not an empty string
+        if not os.path.exists(pardir):
+            os.makedirs(pardir)
+
+
+# ==============================================================================
+#                                                                       FILE2STR
+# ==============================================================================
+def file2str(file):
+    """ Takes a file path and returns the contents of that file as a string."""
+    with open(file, "r") as textFile:
+        return textFile.read()
+
+# ==============================================================================
+#                                                                       STR2FILE
+# ==============================================================================
+def str2file(s, file, mode="w"):
+    """ Writes a string to a file"""
+    # Ensure parent directory and necesary file structure exists
+    pardir = os.path.dirname(file)
+    if pardir.strip() != "": # ensure pardir is not an empty string
+        if not os.path.exists(pardir):
+            os.makedirs(pardir)
+
+    with open(file, mode=mode) as textFile:
+        textFile.write(s)
+
+
+# ==============================================================================
+#                                                                     OBJ2PICKLE
+# ==============================================================================
+def obj2pickle(obj, file, protocol=2):
+    """ Saves an object as a binary pickle file to the desired file path. """
+    # Ensure parent directory and necesary file structure exists
+    pardir = os.path.dirname(file)
+    if pardir.strip() != "": # ensure pardir is not an empty string
+        if not os.path.exists(pardir):
+            os.makedirs(pardir)
+
+    with open(file, mode="wb") as fileObj:
+        pickle.dump(obj, fileObj, protocol=protocol)
+
+
+# ==============================================================================
+#                                                                     PICKLE2OBJ
+# ==============================================================================
+def pickle2obj(file):
+    """ Loads the contents of a pickle as a python object. """
+    with open(file, mode = "rb") as fileObj:
+        obj = pickle.load(fileObj)
+    return obj
 
 
 # ==============================================================================
