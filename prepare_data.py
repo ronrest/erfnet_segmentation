@@ -5,6 +5,13 @@ import PIL.Image
 import numpy as np
 import pickle
 
+__author__ = "Ronny Restrepo"
+__copyright__ = "Copyright 2017, Ronny Restrepo"
+__credits__ = ["Ronny Restrepo"]
+__license__ = "Apache License"
+__version__ = "2.0"
+
+
 label_colormap = {
     "Animal": (64, 128, 64),
     "Archway": (192, 0, 128),
