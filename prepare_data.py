@@ -76,3 +76,21 @@ label2id = {label:id for id, label in enumerate(id2label)}
 assert set(colormap) == set(id2label) == set(label2id.keys()), "Something is wrong with the id label maps"
 
 
+# ==============================================================================
+#                                                              CREATE_FILE_LISTS
+# ==============================================================================
+def create_file_lists(inputs_dir, labels_dir):
+    """ Given the paths to the directories containing the input and label
+        images, it creates a list of the full filepaths for those images,
+        with the same ordering, so the same index in each list represents
+        the corresponding input/label pair.
+
+        Returns 2-tuple of two lists: (input_files, label_files)
+    """
+    # Create (synchronized) lists of full file paths to input and label images
+    label_files = glob.glob(os.path.join(labels_dir, "*.png"))
+    file_ids = [os.path.basename(f).replace("_L.png", ".png") for f in label_files]
+    input_files = [os.path.join(inputs_dir, file_id) for file_id in file_ids]
+    return input_files, label_files
+
+
