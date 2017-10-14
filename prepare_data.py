@@ -97,3 +97,14 @@ def create_file_lists(inputs_dir, labels_dir):
     return input_files, label_files
 
 
+# ==============================================================================
+#                                                               CREATE_DATA_DICT
+# ==============================================================================
+def create_data_dict(data_dir, X_train_subdir="train_labels", Y_train_subdir="train_inputs"):
+    data = {}
+    data["X_train"], data["Y_train"] = create_file_lists(
+        inputs_dir=os.path.join(datadir, X_train_subdir),
+        labels_dir=os.path.join(datadir, Y_train_subdir))
+    return data
+
+
