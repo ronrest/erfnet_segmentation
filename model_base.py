@@ -114,7 +114,7 @@ class ImageClassificationModel(object):
     def create_graph_from_logits_func(self, logits_func):
         """ Given a logits function with the following API:
 
-                `logits_func(X, Y, alpha, dropout, l2, is_training)`
+                `logits_func(X, Y, n_classes, alpha, dropout, l2, is_training)`
                 Returning: `logits`
 
                 NOTE: that the argument names are what is important, not the
@@ -127,7 +127,7 @@ class ImageClassificationModel(object):
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.create_input_ops()
-            self.logits = logits_func(X=self.X, Y=self.Y, alpha=self.alpha, dropout=self.dropout, l2=self.l2_scale, is_training=self.is_training)
+            self.logits = logits_func(X=self.X, Y=self.Y, n_classes=self.n_classes, alpha=self.alpha, dropout=self.dropout, l2=self.l2_scale, is_training=self.is_training)
             self.create_preds_op()
             self.create_loss_ops()
             self.create_optimization_ops()
@@ -188,7 +188,7 @@ class ImageClassificationModel(object):
         # PREDUCTIONS - get a class value for each sample
         with tf.name_scope("preds") as scope:
             self.preds = tf.to_int32(tf.argmax(self.logits, axis=-1), name=scope)
-            # self.preds = tf.to_int32(tf.argmax(self.logits, axis=1), name=scope)
+            self.probs = tf.nn.softmax(self.logits,name="probs") # probability distributions
 
     def create_evaluation_metric_ops(self):
         # EVALUATION METRIC
@@ -411,20 +411,58 @@ class ImageClassificationModel(object):
                 self.update_status_file("crashed")
                 raise
 
-    def predict(self, X, batch_size=32, verbose=True, best=True, session=None):
+    def predict(self, X, batch_size=32, best=True, session=None, probs=False, verbose=True):
+        """ Make predictions on data `X`. Returns the most likely class id
+            for each training sample in `X`. You can optionally return the
+            probability distribution for all the classes instead by setting
+            `probs=True`
+
+        Args:
+            X:              (np array) inputs
+            batch_size:     (int)(default=32)
+            best:           (bool)(default=True) Use the best saved snapshot?
+                            If set to False, it uses the latest snapshot.
+            session:        (None or tensroflow session)(default=None)
+                            Pass a currently running session if you are already
+                            in a session. Else, it starts a new one.
+            probs:          (bool)(default=False) If set to `True` it returns
+                            the probability distribution of each class instead
+                            of the id of the most likely class.
+            verbose:        (bool)(default=True) If `True`, it prints out
+                            progress.
+        """
         if session is None:
             with tf.Session(graph=self.graph) as sess:
                 self.initialize_vars(sess, best=best)
-                return self.predict_in_session(X, session=sess, batch_size=batch_size, verbose=verbose, best=best)
+                return self.predict_in_session(X, session=sess, batch_size=batch_size, verbose=verbose, probs=probs)
         else:
-            return self.predict_in_session(X, session=session, batch_size=batch_size, verbose=verbose)
+            return self.predict_in_session(X, session=session, batch_size=batch_size, verbose=verbose, probs=probs)
 
-    def predict_in_session(self, X, session, batch_size=32, verbose=True):
-        """Given input X make a forward pass of the model to get predictions"""
+    def predict_in_session(self, X, session, batch_size=32, probs=False, verbose=True):
+        """ Make predictions on data `X` within a currently running session.
+            Returns the most likely class id for each training sample in `X`.
+            You can optionally return the probability distribution for all
+            the classes instead by setting `probs=True`
+
+        Args:
+            X:              (np array) inputs
+            session:        (tensroflow session) Currently running session.
+            batch_size:     (int)(default=32)
+            probs:          (bool)(default=False) If set to `True` it returns
+                            the probability distribution of each class instead
+                            of the id of the most likely class.
+            verbose:        (bool)(default=True) If `True`, it prints out
+                            progress.
+        """
         # Dimensions
         n_samples = X.shape[0]
         n_batches = int(np.ceil(n_samples/batch_size))
-        preds = np.zeros([n_samples, self.img_height, self.img_width], dtype=np.uint8)
+        if probs:
+            preds = np.zeros([n_samples, self.n_classes], dtype=np.float32)
+            op = self.probs
+        else:
+            preds = np.zeros(n_samples, dtype=np.uint8)
+            op = self.preds
         if verbose:
             print("MAKING PREDICTIONS")
             percent_interval=10
@@ -435,7 +473,7 @@ class ImageClassificationModel(object):
         for i in range(n_batches):
             X_batch = self.get_batch(i, batch_size=batch_size, X=X)
             feed_dict = {self.X:X_batch, self.is_training:False}
-            batch_preds = session.run(self.preds, feed_dict=feed_dict)
+            batch_preds = session.run(op, feed_dict=feed_dict)
             preds[batch_size*i: batch_size*(i+1)] = batch_preds.squeeze()
 
             if verbose and (i+1)%print_every == 0:
@@ -470,7 +508,7 @@ class ImageClassificationModel(object):
             total_loss += loss
 
         score = session.run(self.evaluation)
-        avg_loss = total_loss/float(n_samples)
+        avg_loss = total_loss/float(n_batches)
         return score, avg_loss
 
 
