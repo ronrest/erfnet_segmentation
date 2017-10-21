@@ -795,19 +795,6 @@ class SegmentationModel(ImageClassificationModel):
 
             self.logits = deconv(u1, num_outputs=n_classes, kernel_size=4, stride=2, activation_fn=None, scope="logits")
 
-    def create_evaluation_metric_ops(self):
-        # EVALUATION METRIC - IoU
-        with tf.name_scope("evaluation") as scope:
-            # Define the evaluation metric and update operations
-            self.evaluation, self.update_evaluation_vars = tf.metrics.mean_iou(
-                tf.reshape(self.Y, [-1]),
-                tf.reshape(self.preds, [-1]),
-                num_classes=self.n_classes,
-                name=scope)
-            # Isolate metric's running variables & create their initializer/reset op
-            evaluation_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope=scope)
-            self.reset_evaluation_vars = tf.variables_initializer(var_list=evaluation_vars)
-
     def train(self, data, n_epochs, alpha=0.001, dropout=0.0, batch_size=32, print_every=10, l2=None, aug_func=None, viz_every=10):
         """Trains the model, for n_epochs given a dictionary of data"""
         # TODO: The only difference between this code and the code in
@@ -815,7 +802,7 @@ class SegmentationModel(ImageClassificationModel):
         # generic way to recycle the same code.
         n_samples = len(data["X_train"])               # Num training samples
         n_batches = int(np.ceil(n_samples/batch_size)) # Num batches per epoch
-        print("DEBUG - ", "using aug func" if aug_func is not None else "NOT using aug func")
+        print("- ", "using aug func" if aug_func is not None else "NOT using aug func")
         with tf.Session(graph=self.graph) as sess:
             self.initialize_vars(sess)
             t0 = time.time()
