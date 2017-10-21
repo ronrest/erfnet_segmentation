@@ -325,6 +325,9 @@ def prepare_data(data_file, valid_from_train=False, n_valid=1024, max_data=None,
     n_viz = 25
     data["X_train_viz"] = data["X_train"][:25]
     data["Y_train_viz"] = data["Y_train"][:25]
+
+    data["id2label"] = id2label
+    data["label2id"] = label2id
     data["colormap"] = idcolormap
 
     if verbose:
