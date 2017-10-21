@@ -728,55 +728,49 @@ class SegmentationModel(ImageClassificationModel):
                self.l2
                self.n_classes
         """
+        # Convenient layer operation shortcuts
+        fc = tf.contrib.layers.fully_connected
+        conv = tf.contrib.layers.conv2d
+        # convsep = tf.contrib.layers.separable_conv2d
+        deconv = tf.contrib.layers.conv2d_transpose
+        relu = tf.nn.relu
+        maxpool = tf.contrib.layers.max_pool2d
+        dropout_layer = tf.layers.dropout
+        batchnorm = tf.contrib.layers.batch_norm
+        bn_params = {"is_training": self.is_training}
+        winit = tf.contrib.layers.xavier_initializer()
+
+        n_classes = self.n_classes
+
         # default body graph. Override this in your inherited class
         with tf.name_scope("preprocess") as scope:
             x = tf.div(self.X, 255, name="rescaled_inputs")
 
-        with tf.contrib.framework.arg_scope(
-            [tf.contrib.layers.conv2d, tf.contrib.layers],
-            activation_fn=tf.nn.relu,
-            normalizer_fn=tf.contrib.layers.batch_norm,
-            normalizer_params={"is_training": self.is_training}
-            ):
-            # DOWNSAMPLING
-            x = tf.contrib.layers.conv2d(x, num_outputs=8, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
-            x = tf.contrib.layers.conv2d(x, num_outputs=16, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
-            x = tf.contrib.layers.conv2d(x, num_outputs=32, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
-
-        relu = tf.nn.relu
-        n_classes = self.n_classes
-        conv2d = tf.contrib.layers.conv2d
-        deconv = tf.contrib.layers.conv2d_transpose
-
         # DOWNSAMPLING
         with tf.contrib.framework.arg_scope(\
-            [tf.contrib.layers.conv2d],
+            [conv],
             padding = "SAME",
             stride = 2,
-            activation_fn =tf.nn.relu,
-            normalizer_fn=tf.contrib.layers.batch_norm,
+            activation_fn = relu,
+            normalizer_fn=batchnorm,
             normalizer_params = {"is_training": self.is_training},
-            weights_initializer =tf.contrib.layers.xavier_initializer(),
+            weights_initializer = winit,
             weights_regularizer =None,
             variables_collections =None,
             trainable =True):
-
-            d1 = conv2d(x, num_outputs=8, kernel_size=3, scope="d1")
-            d2 = conv2d(d1, num_outputs=32, kernel_size=3, scope="d2")
-            d3 = conv2d(d2, num_outputs=64, kernel_size=3, scope="d3")
-            d4 = conv2d(d3, num_outputs=64, kernel_size=3, scope="d4")
+            d1 = conv(x, num_outputs=8, kernel_size=3, scope="d1")
+            d2 = conv(d1, num_outputs=32, kernel_size=3, scope="d2")
+            d3 = conv(d2, num_outputs=64, kernel_size=3, scope="d3")
+            d4 = conv(d3, num_outputs=64, kernel_size=3, scope="d4")
 
         # UPSAMPLING
-        with tf.contrib.framework.arg_scope([deconv, conv2d], \
+        with tf.contrib.framework.arg_scope([deconv, conv], \
             padding = "SAME",
             stride = 2,
             activation_fn = None,
             normalizer_fn = None,
             normalizer_params = {"is_training": self.is_training},
-            weights_initializer = tf.contrib.layers.xavier_initializer(),
+            weights_initializer = winit,
             weights_regularizer = None,
             variables_collections = None,
             trainable = True):
@@ -784,19 +778,19 @@ class SegmentationModel(ImageClassificationModel):
             with tf.variable_scope('u3') as scope:
                 previous, residual = d4, d3
                 u = deconv(previous, num_outputs=n_classes, kernel_size=4, stride=2)
-                s = conv2d(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
+                s = conv(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
                 u3 = tf.add(u, s, name="up")
 
             with tf.variable_scope('u2') as scope:
                 previous, residual = u3, d2
                 u = deconv(previous, num_outputs=n_classes, kernel_size=4, stride=2)
-                s = conv2d(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
+                s = conv(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
                 u2 = tf.add(u, s, name="up")
 
             with tf.variable_scope('u1') as scope:
                 previous, residual = u2, d1
                 u = deconv(previous, num_outputs=n_classes, kernel_size=4, stride=2)
-                s = conv2d(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
+                s = conv(residual, num_outputs=n_classes, kernel_size=1, stride=1, activation_fn=relu, scope="skip")
                 u1 = tf.add(u, s, name="up")
 
             self.logits = deconv(u1, num_outputs=n_classes, kernel_size=4, stride=2, activation_fn=None, scope="logits")
