@@ -80,6 +80,9 @@ class ImageClassificationModel(object):
             If logits_func is None, then you should create a new class that inherits
             from this one that overides `self.body()`
         """
+        # Print the model name
+        print(("#"*60)+"\n()"+name.upper()+"\n"+("#"*60)+"\n()")
+
         # MODEL SETTINGS
         # TODO: Save the best evals metric to evals dict, and use that as the
         #       default to load up if none is passed in argument.
