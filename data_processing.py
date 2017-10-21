@@ -321,6 +321,12 @@ def prepare_data(data_file, valid_from_train=False, n_valid=1024, max_data=None,
         data["X_train"] = data["X_train"][:max_data]
         data["Y_train"] = data["Y_train"][:max_data]
 
+    # Visualization data
+    n_viz = 25
+    data["X_train_viz"] = data["X_train"][:25]
+    data["Y_train_viz"] = data["Y_train"][:25]
+    data["colormap"] = idcolormap
+
     if verbose:
         # Print information about data
         print("DATA SHAPES")
