@@ -424,7 +424,7 @@ class ImageClassificationModel(object):
         """Trains the model, for n_epochs given a dictionary of data"""
         n_samples = len(data["X_train"])               # Num training samples
         n_batches = int(np.ceil(n_samples/batch_size)) # Num batches per epoch
-        print("DEBUG - ", "using aug func" if aug_func is not None else "NOT using aug func")
+        print("- ", "using aug func" if aug_func is not None else "NOT using aug func")
         with tf.Session(graph=self.graph) as sess:
             self.initialize_vars(sess)
             t0 = time.time()
