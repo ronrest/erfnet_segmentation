@@ -534,11 +534,12 @@ class ImageClassificationModel(object):
         # Dimensions
         n_samples = X.shape[0]
         n_batches = int(np.ceil(n_samples/batch_size))
+        out_sample_shape = self.Y.shape.as_list()[1:]
         if probs:
-            preds = np.zeros([n_samples, self.n_classes], dtype=np.float32)
+            preds = np.zeros([n_samples]+out_sample_shape+[self.n_classes], dtype=np.float32)
             op = self.probs
         else:
-            preds = np.zeros(n_samples, dtype=np.uint8)
+            preds = np.zeros([n_samples]+out_sample_shape, dtype=np.uint8)
             op = self.preds
         if verbose:
             print("MAKING PREDICTIONS")
