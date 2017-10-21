@@ -686,6 +686,21 @@ class SegmentationModel(ImageClassificationModel):
             self.n_classes = n_classes
             self.single_class_mode = False
 
+    def create_input_ops(self):
+        # TODO: This handling of L2 is ugly, fix it.
+        if self.l2 is None:
+            l2_scale = 0.0
+        else:
+            l2_scale = self.l2
+
+        with tf.variable_scope("inputs"):
+            self.X = tf.placeholder(tf.float32, shape=(None, self.img_height, self.img_width, self.n_channels), name="X") # [batch, rows, cols, chanels]
+            self.Y = tf.placeholder(tf.int32, shape=(None, self.img_height, self.img_width), name="Y")   # [batch]
+            self.alpha = tf.placeholder_with_default(0.001, shape=None, name="alpha")
+            self.is_training = tf.placeholder_with_default(False, shape=(), name="is_training")
+            self.l2_scale = tf.placeholder_with_default(l2_scale, shape=(), name="l2_scale")
+            self.dropout = tf.placeholder_with_default(0.0, shape=None, name="dropout")
+
     def create_body_ops(self):
         """Override this method in child classes.
            must return pre-activation logits of the output layer
