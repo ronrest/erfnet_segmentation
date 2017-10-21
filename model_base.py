@@ -11,8 +11,9 @@ import shutil
 import time
 import pickle
 
-from data_processing import maybe_make_pardir, pickle2obj, obj2pickle, str2file, load_batch_of_images
 from viz import train_curves, batch2grid, vizseg
+from data_processing import maybe_make_pardir, pickle2obj, obj2pickle, str2file #,load_batch_of_images
+
 
 __author__ = "Ronny Restrepo"
 __copyright__ = "Copyright 2017, Ronny Restrepo"
