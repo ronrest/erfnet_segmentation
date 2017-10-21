@@ -701,6 +701,19 @@ class SegmentationModel(ImageClassificationModel):
             self.l2_scale = tf.placeholder_with_default(l2_scale, shape=(), name="l2_scale")
             self.dropout = tf.placeholder_with_default(0.0, shape=None, name="dropout")
 
+    def create_evaluation_metric_ops(self):
+        # EVALUATION METRIC - IoU
+        with tf.name_scope("evaluation") as scope:
+            # Define the evaluation metric and update operations
+            self.evaluation, self.update_evaluation_vars = tf.metrics.mean_iou(
+                tf.reshape(self.Y, [-1]),
+                tf.reshape(self.preds, [-1]),
+                num_classes=self.n_classes,
+                name=scope)
+            # Isolate metric's running variables & create their initializer/reset op
+            evaluation_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope=scope)
+            self.reset_evaluation_vars = tf.variables_initializer(var_list=evaluation_vars)
+
     def create_body_ops(self):
         """Override this method in child classes.
            must return pre-activation logits of the output layer
