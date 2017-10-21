@@ -868,3 +868,30 @@ class SegmentationModel(ImageClassificationModel):
             except:
                 self.update_status_file("crashed")
                 raise
+
+    def visualise_semgmentations(self, data, session, shape=[5,5]):
+        # TODO: URGENT: Make this function dynamic data loading friendly
+        viz_rows, viz_cols = shape
+        n_viz = viz_rows * viz_cols
+        viz_img_template = os.path.join(self.model_dir, "samples", "{}", "epoch_{:07d}.jpg")
+
+        # On train data
+        preds = self.predict_in_session(data["X_train_viz"][:n_viz], session=session, batch_size=self.batch_size, verbose=False)
+        vizseg(
+            img=batch2grid(data["X_train_viz"][:n_viz], viz_rows, viz_cols),
+            label=batch2grid(data["Y_train_viz"][:n_viz], viz_rows, viz_cols),
+            pred=batch2grid(preds[:n_viz], viz_rows, viz_cols),
+            colormap=data.get("colormap", None),
+            saveto=viz_img_template.format("train", self.global_epoch)
+            )
+
+        # On validation Data
+        preds = self.predict_in_session(data["X_valid"][:n_viz], session=session, batch_size=self.batch_size, verbose=False)
+        vizseg(
+            img=batch2grid(data["X_valid"][:n_viz], viz_rows, viz_cols),
+            label=batch2grid(data["Y_valid"][:n_viz], viz_rows, viz_cols),
+            pred=batch2grid(preds[:n_viz], viz_rows, viz_cols),
+            colormap=data.get("colormap", None),
+            saveto=viz_img_template.format("valid", self.global_epoch)
+            )
+
