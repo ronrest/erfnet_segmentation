@@ -371,6 +371,10 @@ def viz_overlayed_segmentation_label(img, label, colormap=None, alpha=0.5, savet
     return overlay
 
 
+def vizseg(img, label, pred, saveto, colormap=None):
+    viz_overlayed_segmentation_label(img=img, label=pred, colormap=colormap, alpha=0.5, saveto=saveto)
+
+
 # ==============================================================================
 #                                                   VIZ_SAMPLE_SEG_AUGMENTATIONS
 # ==============================================================================
