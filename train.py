@@ -79,3 +79,15 @@ def get_vgg_argscope(weight_decay=0.0005, use_batch_norm=False, is_training=Fals
 # viz_sample_augmentations(data["X_train"], aug_func=aug_func, n_images=10, n_per_image=5, saveto=None)
 
 
+# ##############################################################################
+#                                                                           MAIN
+# ##############################################################################
+if __name__ == '__main__':
+    # SETTINGS
+    n_valid = 128
+    data_file = "data_256.pickle"
+    vgg16_snapshot = "/path/to/vgg16/vgg_16.ckpt"
+    data = prepare_data(data_file, valid_from_train=True, n_valid=n_valid, max_data=None)
+    n_classes = len(data["id2label"])
+
+    print("DONE!!!")
