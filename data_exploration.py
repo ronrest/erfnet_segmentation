@@ -3,8 +3,6 @@ from viz import viz_overlayed_segmentation_label, viz_segmentation_label, batch2
 from data_processing import pickle2obj
 from data_processing import idcolormap, id2label
 
-
-
 # ==============================================================================
 #                                                                        RGB2HEX
 # ==============================================================================

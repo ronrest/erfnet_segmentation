@@ -348,8 +348,8 @@ if __name__ == '__main__':
     # SETTINGS
     data_dir = "/path/to/camvid"
     data_dir = "/home/ronny/TEMP/camvid/"
-    pickle_file = "data.pickle"
-    shape = [128, 128]
+    pickle_file = "data_256.pickle"
+    shape = [256, 256]
     width, height = shape
     n_channels = 3
     label_chanel_axis=False # Create chanels axis for label images?
