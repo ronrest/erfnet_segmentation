@@ -55,6 +55,41 @@ def get_vgg_argscope(weight_decay=0.0005, use_batch_norm=False, is_training=Fals
         with tf.contrib.framework.arg_scope([conv], padding='SAME') as scope:
                 return scope
 
+
+# ==============================================================================
+#                                                                   VGG16_TRUNK
+# ==============================================================================
+def vgg16_trunk(inputs, weight_decay=0.0005, use_batch_norm=False, is_training=False):
+    """ VGG layers before the fully connected layers """
+    with tf.variable_scope("vgg_16", "vgg_16"):
+        with tf.contrib.framework.arg_scope(get_vgg_argscope(
+                weight_decay=weight_decay,
+                use_batch_norm=use_batch_norm,
+                is_training=is_training)):
+            endpoints = {}
+            x = repeat(inputs, 2, conv, num_outputs=64, kernel_size=3, scope='conv1')
+            endpoints["conv1"] = x
+            x = maxpool(x, kernel_size=2, scope='pool1')
+            endpoints["pool1"] = x
+            x = repeat(x, 2, conv, num_outputs=128, kernel_size=3, scope='conv2')
+            endpoints["conv2"] = x
+            x = maxpool(x, kernel_size=2, scope='pool2')
+            endpoints["pool2"] = x
+            x = repeat(x, 3, conv, num_outputs=256, kernel_size=3, scope='conv3')
+            endpoints["conv3"] = x
+            x = maxpool(x, kernel_size=2, scope='pool3')
+            endpoints["pool3"] = x
+            x = repeat(x, 3, conv, num_outputs=512, kernel_size=3, scope='conv4')
+            endpoints["conv4"] = x
+            x = maxpool(x, kernel_size=2, scope='pool4')
+            endpoints["pool4"] = x
+            x = repeat(x, 3, conv, num_outputs=512, kernel_size=3, scope='conv5')
+            endpoints["conv5"] = x
+            x = maxpool(x, kernel_size=2, scope='pool5')
+            endpoints["pool5"] = x
+            return x, endpoints
+
+
 # ##############################################################################
 #                                                                   AUGMENTATION
 # ##############################################################################
