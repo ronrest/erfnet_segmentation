@@ -270,12 +270,12 @@ class ImageClassificationModel(object):
         """ Create operations to save/restore model weights """
         with tf.device('/cpu:0'): # prevent more than one thread doing file I/O
             # PRETRAINED SAVER
-            pretrained_vars = tf.contrib.framework.get_variables_to_restore(include=self.pretrained_include, exclude=self.pretrained_exclude)
-            self.pretrained_saver = tf.train.Saver(pretrained_vars, name="pretrained_saver")
+            self.pretrained_vars = tf.contrib.framework.get_variables_to_restore(include=self.pretrained_include, exclude=self.pretrained_exclude)
+            self.pretrained_saver = tf.train.Saver(self.pretrained_vars, name="pretrained_saver")
 
-            # # REMAINDER INITIALIZER - all others not handled by pretrained snapshot
-            # remainder_vars = tf.contrib.framework.get_variables_to_restore(exclude=[var.name for var in pretrained_vars])
-            # self.remainder_initializer = tf.variables_initializer(var_list=remainder_vars)
+            # REMAINDER INITIALIZER - all others not handled by pretrained snapshot
+            self.remainder_vars = tf.contrib.framework.get_variables_to_restore(exclude=[var.name for var in self.pretrained_vars])
+            self.remainder_initializer = tf.variables_initializer(var_list=self.remainder_vars)
 
     def create_directory_structure(self):
         """ Ensure the necessary directory structure exists for saving this model """
@@ -318,12 +318,6 @@ class ImageClassificationModel(object):
         else:
             snapshot_file = self.snapshot_file
 
-        # Check if this model already has saved snapshots
-        # If not:
-        #    Initialize weights using random intializer.
-        #    check if using pretrained weights.
-        #         if so, then initialize from pretrained weights, random
-        #         from others
         try:
             # Determine if it can continue training from a previous run,
             # or if it needs to be intialized from the begining.
@@ -335,11 +329,13 @@ class ImageClassificationModel(object):
                 snapshot_file = self.pretrained_snapshot
                 print("Initializing from Pretrained Weights")
                 print("-", snapshot_file)
-                session.run(tf.global_variables_initializer())
                 assert self.snapshot_exists(snapshot_file),\
                     "The pretrained weights file does not exist: \n- "\
                     + str(snapshot_file)
                 self.pretrained_saver.restore(session, snapshot_file)
+
+                print("- And initializing the remaining variables from scratch")
+                session.run(self.remainder_initializer)
             else:
                 print("Initializing to new parameter values")
                 session.run(tf.global_variables_initializer())
