@@ -287,7 +287,7 @@ class ImageClassificationModel(object):
         """ If evals file exists, load it, otherwise create one from scratch.
             You should specify the keys you want to use in the dict."""
         if os.path.exists(self.evals_file):
-            print("Loading previosuly saved evals file from: \n- ", self.evals_file)
+            print("- Loading previosuly saved evals file from: \n- ", self.evals_file)
             with open(self.evals_file, mode = "rb") as fileObj:
                 self.evals = pickle.load(fileObj)
         else:
@@ -322,13 +322,13 @@ class ImageClassificationModel(object):
             # Determine if it can continue training from a previous run,
             # or if it needs to be intialized from the begining.
             if self.snapshot_exists(snapshot_file):
-                print("Restoring parameters from saved snapshot")
-                print("-", snapshot_file)
+                print("- Restoring parameters from saved snapshot")
+                print("  -", snapshot_file)
                 self.saver.restore(session, snapshot_file)
             elif self.pretrained_model:
                 snapshot_file = self.pretrained_snapshot
-                print("Initializing from Pretrained Weights")
-                print("-", snapshot_file)
+                print("- Initializing from Pretrained Weights")
+                print("  -", snapshot_file)
                 assert self.snapshot_exists(snapshot_file),\
                     "The pretrained weights file does not exist: \n- "\
                     + str(snapshot_file)
@@ -337,7 +337,7 @@ class ImageClassificationModel(object):
                 print("- And initializing the remaining variables from scratch")
                 session.run(self.remainder_initializer)
             else:
-                print("Initializing to new parameter values")
+                print("- Initializing to new parameter values")
                 session.run(tf.global_variables_initializer())
         except (tf.errors.InvalidArgumentError, tf.errors.NotFoundError) as e:
             msg = "===================================================\n"\
