@@ -55,3 +55,27 @@ def get_vgg_argscope(weight_decay=0.0005, use_batch_norm=False, is_training=Fals
         with tf.contrib.framework.arg_scope([conv], padding='SAME') as scope:
                 return scope
 
+# ##############################################################################
+#                                                                   AUGMENTATION
+# ##############################################################################
+# from image_processing import create_augmentation_func
+#
+# aug_func = create_augmentation_func(
+#     shadow=(0.01, 0.8),
+#     shadow_file="shadow_pattern.jpg",
+#     shadow_crop_range=(0.02, 0.5),
+#     rotate=30,
+#     crop=0.66,
+#     lr_flip=False,
+#     tb_flip=False,
+#     brightness=(0.5, 0.4, 4),
+#     contrast=(0.5, 0.3, 5),
+#     blur=1,
+#     noise=10
+#     )
+
+# # Visualize samples of augmentations
+# from viz import viz_sample_augmentations
+# viz_sample_augmentations(data["X_train"], aug_func=aug_func, n_images=10, n_per_image=5, saveto=None)
+
+
