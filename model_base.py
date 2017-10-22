@@ -33,6 +33,9 @@ dropout_layer = tf.layers.dropout
 batchnorm = tf.contrib.layers.batch_norm
 # bn_params = {"is_training": is_training}
 winit = tf.contrib.layers.xavier_initializer()
+repeat = tf.contrib.layers.repeat
+arg_scope = tf.contrib.framework.arg_scope
+l2_regularizer = tf.contrib.layers.l2_regularizer
 
 
 # TODO: URGENT:  load_batch_of_images has not been implemented
