@@ -48,7 +48,6 @@ def pretty_time(t):
     M, S = divmod(r, 60)
     return "{:02n}:{:02n}:{:02n}".format(H,M,S)
 
-
 # ##############################################################################
 #                                                     IMAGE CLASSIFICATION MODEL
 # ##############################################################################
@@ -606,10 +605,6 @@ class ImageClassificationModel(object):
 
 
 # ==============================================================================
-# ==============================================================================
-
-
-# ==============================================================================
 #                                                       GRAPH_FROM_GRAPHDEF_FILE
 # ==============================================================================
 def graph_from_graphdef_file(graph_file, access_these, remap_input=None):
@@ -660,6 +655,7 @@ def graph_from_graphdef_file(graph_file, access_these, remap_input=None):
         return_elements=access_these,
         input_map=remap_input)
     return requested_ops
+
 
 
 # ==============================================================================
@@ -894,4 +890,3 @@ class SegmentationModel(ImageClassificationModel):
             colormap=data.get("colormap", None),
             saveto=viz_img_template.format("valid", self.global_epoch)
             )
-
