@@ -81,7 +81,7 @@ class ImageClassificationModel(object):
             from this one that overides `self.body()`
         """
         # Print the model name
-        print(("#"*60)+"\n()"+name.upper()+"\n"+("#"*60)+"\n()")
+        print(("#"*60)+"\n"+name.upper()+"\n"+("#"*60)+"\n")
 
         # MODEL SETTINGS
         # TODO: Save the best evals metric to evals dict, and use that as the
