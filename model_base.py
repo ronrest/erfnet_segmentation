@@ -22,6 +22,19 @@ __license__ = "Apache License"
 __version__ = "2.0"
 
 
+# Convenient layer operation shortcuts
+fc = tf.contrib.layers.fully_connected
+conv = tf.contrib.layers.conv2d
+# convsep = tf.contrib.layers.separable_conv2d
+deconv = tf.contrib.layers.conv2d_transpose
+relu = tf.nn.relu
+maxpool = tf.contrib.layers.max_pool2d
+dropout_layer = tf.layers.dropout
+batchnorm = tf.contrib.layers.batch_norm
+# bn_params = {"is_training": is_training}
+winit = tf.contrib.layers.xavier_initializer()
+
+
 # TODO: URGENT:  load_batch_of_images has not been implemented
 
 
@@ -196,19 +209,19 @@ class ImageClassificationModel(object):
             x = tf.div(self.X, 255, name="rescaled_inputs")
 
         with tf.contrib.framework.arg_scope(
-            [tf.contrib.layers.conv2d, tf.contrib.layers.fully_connected],
+            [conv, fc],
             activation_fn=tf.nn.relu,
-            normalizer_fn=tf.contrib.layers.batch_norm,
+            normalizer_fn=batchnorm,
             normalizer_params={"is_training": self.is_training}
             ):
-            x = tf.contrib.layers.conv2d(x, num_outputs=8, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
-            x = tf.contrib.layers.conv2d(x, num_outputs=16, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
-            x = tf.contrib.layers.conv2d(x, num_outputs=32, kernel_size=3, stride=2)
-            x = tf.layers.dropout(x, rate=self.dropout)
+            x = conv(x, num_outputs=8, kernel_size=3, stride=2)
+            x = dropout_layer(x, rate=self.dropout)
+            x = conv(x, num_outputs=16, kernel_size=3, stride=2)
+            x = dropout_layer(x, rate=self.dropout)
+            x = conv(x, num_outputs=32, kernel_size=3, stride=2)
+            x = dropout_layer(x, rate=self.dropout)
             x = tf.contrib.layers.flatten(x)
-            self.logits = tf.contrib.layers.fully_connected(x, num_outputs=self.n_classes, normalizer_fn=None, activation_fn=None, scope="logits")
+            self.logits = fc(x, num_outputs=self.n_classes, normalizer_fn=None, activation_fn=None, scope="logits")
 
     def create_preds_op(self):
         # PREDUCTIONS - get a class value for each sample
@@ -727,18 +740,6 @@ class SegmentationModel(ImageClassificationModel):
                self.l2
                self.n_classes
         """
-        # Convenient layer operation shortcuts
-        fc = tf.contrib.layers.fully_connected
-        conv = tf.contrib.layers.conv2d
-        # convsep = tf.contrib.layers.separable_conv2d
-        deconv = tf.contrib.layers.conv2d_transpose
-        relu = tf.nn.relu
-        maxpool = tf.contrib.layers.max_pool2d
-        dropout_layer = tf.layers.dropout
-        batchnorm = tf.contrib.layers.batch_norm
-        bn_params = {"is_training": self.is_training}
-        winit = tf.contrib.layers.xavier_initializer()
-
         n_classes = self.n_classes
 
         # default body graph. Override this in your inherited class
