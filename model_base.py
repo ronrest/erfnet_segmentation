@@ -329,6 +329,9 @@ class ImageClassificationModel(object):
                 snapshot_file = self.pretrained_snapshot
                 print("- Initializing from Pretrained Weights")
                 print("  -", snapshot_file)
+                print("- initialising the following variables from pretrained snapshot: ")
+                for var in self.pretrained_vars:
+                    print("  -", var.name)
                 assert self.snapshot_exists(snapshot_file),\
                     "The pretrained weights file does not exist: \n- "\
                     + str(snapshot_file)
