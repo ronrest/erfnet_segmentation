@@ -80,7 +80,7 @@ def batch2grid(X, rows, cols):
     # TODO: Have a random shuffle option
     # TODO: Set the random seed if needed
     # TODO: Let it accept images without color channels axis
-    assert (X.ndim == 4), "X is wrong dimensions"
+    assert (X.ndim == 4), "X is wrong dimensions. Reecived {}".format(X.shape)
     assert rows>0 and cols>0, "rows and cols must be positive integers"
 
     # Prepare dimensions of the grid
