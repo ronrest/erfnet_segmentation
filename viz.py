@@ -409,3 +409,72 @@ def viz_sample_seg_augmentations(X, Y, aug_func, n_images=5, n_per_image=5, save
 
     # Overlay labels on top of image
     return viz_overlayed_segmentation_label(img=gx, label=gy, saveto=saveto)
+
+
+# ==============================================================================
+#                                                         VIZ_SEGMENTATION_PAIRS
+# ==============================================================================
+def viz_segmentation_pairs(X, Y, Y2=None, colormap=None, gridshape=(2,8), saveto=None):
+    """
+
+    """
+    assert (X.ndim == 3) or (X.ndim == 4 and X.shape[-1] in {1,3}), "X is wrong dimensions"
+    assert (Y.ndim == 3), "Y is wrong dimensions"
+    assert (Y2 is None) or (Y2.ndim == 3), "Y2 is wrong dimensions"
+
+    # LIMIT SAMPLES- Only use the number of images needed to fill grid
+    rows, cols = gridshape
+    assert rows>0 and cols>0, "rows and cols must be positive integers"
+    n_cells = (rows*cols)
+    X = X[:n_cells]
+    n_samples = X.shape[0]
+
+    # RESHAPE INPUT IMAGES - to include a color channels axis
+    if (X.ndim == 3):
+        X = np.expand_dims(X, axis=3)
+
+    # SET COLORMAP
+    if colormap is None:
+        colormap = [[0,0,0], [255,79,64], [115,173,33],[48,126,199]]
+
+    # ---------------------------------------
+    # GROUP THE IMAGES - into pairs/triplets
+    # ---------------------------------------
+    output = []
+    for i in range(min(n_cells, n_samples)):
+        x = X[i]
+        y = Y[i]
+
+        # Convert greyscale images to RGB.
+        if x.shape[-1] == 1:
+            x = np.repeat(x, 3, axis=2)
+
+        # Apply colormap to Y and Y2
+        y = np.array(colormap)[y].astype(np.uint8)
+        if Y2 is None:
+            output.append(np.concatenate([x,y], axis=0))
+        else:
+            y2 = Y2[i]
+            y2 = np.array(colormap)[y2].astype(np.uint8)
+            output.append(np.concatenate([x,y,y2], axis=0))
+
+    output = np.array(output, dtype=np.uint8)
+
+    # ---------------------
+    # CREATE GRID
+    # ---------------------
+    output = batch2grid(output, rows=rows, cols=cols)
+    output = PIL.Image.fromarray(output.squeeze())
+
+    # Optionally save image
+    if saveto is not None:
+        # Create necessary file structure
+        pardir = os.path.dirname(saveto)
+        if pardir.strip() != "": # ensure pardir is not an empty string
+            if not os.path.exists(pardir):
+                os.makedirs(pardir)
+        output.save(saveto, "JPEG")
+
+    return output
+
+
