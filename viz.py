@@ -85,7 +85,6 @@ def batch2grid(X, rows, cols):
 
     # Prepare dimensions of the grid
     n_cells = (rows*cols)
-    print(n_cells)
     n_samples, img_height, img_width, n_channels = X.shape
 
     # Handle case where there is not enough images in batch to fill grid
