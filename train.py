@@ -4,9 +4,9 @@ import tensorflow as tf
 
 # from model_base import ImageClassificationModel
 # from model_base import PretrainedImageClassificationModel
-from data_processing import prepare_data
+from data_processing import prepare_data, calculate_class_weights
 from model_base import SegmentationModel
-import tensorflow as tf
+
 
 __author__ = "Ronny Restrepo"
 __copyright__ = "Copyright 2017, Ronny Restrepo"
@@ -122,7 +122,10 @@ if __name__ == '__main__':
     n_valid = 128
     data_file = "data_256.pickle"
     vgg16_snapshot = "/path/to/vgg16/vgg_16.ckpt"
-    data = prepare_data(data_file, valid_from_train=True, n_valid=n_valid, max_data=None)
+    DATA_LIMIT = None
+    data = prepare_data(data_file, valid_from_train=True, n_valid=n_valid, max_data=DATA_LIMIT)
     n_classes = len(data["id2label"])
+    class_weights = calculate_class_weights(data["Y_train"], n_classes=n_classes, method="paszke", c=1.10)
+    # class_weights = calculate_class_weights(data["Y_train"], n_classes=n_classes, method="logeigen2")
 
     print("DONE!!!")
