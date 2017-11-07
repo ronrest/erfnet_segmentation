@@ -72,7 +72,7 @@ class ImageClassificationModel(object):
     # Lists of scopes of weights to include/exclude from main snapshot
     main_include = None # None includes all variables
     main_exclude = None
-
+    class_weights = None # assign class weights.
 
     def __init__(self,
                  name,
@@ -176,7 +176,6 @@ class ImageClassificationModel(object):
             self.create_saver_ops()
             self.create_tensorboard_ops()
 
-
     def create_input_ops(self):
         # TODO: This handling of L2 is ugly, fix it.
         if self.l2 is None:
@@ -243,12 +242,29 @@ class ImageClassificationModel(object):
             evaluation_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope=scope)
             self.reset_evaluation_vars = tf.variables_initializer(var_list=evaluation_vars)
 
+    def set_class_weights(self, w):
+        self.class_weights = w
+        # TODO: make it handle case where graph has already been created,
+        #       so make it recreate the loss_ops if graph exists.
+
     def create_loss_ops(self):
-        # LOSS - Sums all losses even Regularization losses automatically
         with tf.variable_scope('loss') as scope:
             unrolled_logits = tf.reshape(self.logits, (-1, self.n_classes))
             unrolled_labels = tf.reshape(self.Y, (-1,))
-            tf.losses.sparse_softmax_cross_entropy(labels=unrolled_labels, logits=unrolled_logits, reduction="weighted_sum_by_nonzero_weights")
+
+            # HANDLE CLASS WEIGHTS
+            if self.class_weights is not None:
+                class_weights_tensor = tf.constant(self.class_weights, dtype=tf.float32)
+                label_weights = tf.gather(class_weights_tensor, indices=unrolled_labels)
+                print("- Using Class Weights: \n", self.class_weights)
+            else:
+                weights = 1.0
+                print("- Using uniform Class Weights of 1.0")
+
+            # CACLULATE LOSSES
+            tf.losses.sparse_softmax_cross_entropy(labels=unrolled_labels, logits=unrolled_logits, weights=label_weights, reduction="weighted_sum_by_nonzero_weights")
+
+            # SUMS ALL LOSSES - even Regularization losses automatically
             self.loss = tf.losses.get_total_loss()
 
     def create_optimization_ops(self):
