@@ -849,7 +849,7 @@ class SegmentationModel(ImageClassificationModel):
                     self.save_snapshot_in_session(sess, self.snapshot_file)
 
                     # Evaluate on full train and validation sets after each epoch
-                    train_iou, train_loss = self.evaluate_in_session(data["X_train"][:1000], data["Y_train"][:1000], sess, batch_size=batch_size)
+                    train_iou, train_loss = self.evaluate_in_session(data["X_train"][:1024], data["Y_train"][:1024], sess, batch_size=batch_size)
                     valid_iou, valid_loss = self.evaluate_in_session(data["X_valid"], data["Y_valid"], sess, batch_size=batch_size)
                     self.update_evals_dict(train_iou=train_iou, train_loss=train_loss, valid_iou=valid_iou, valid_loss=valid_loss)
                     self.save_evals_dict()
