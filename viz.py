@@ -421,8 +421,27 @@ def viz_sample_seg_augmentations(X, Y, aug_func, n_images=5, n_per_image=5, save
 #                                                         VIZ_SEGMENTATION_PAIRS
 # ==============================================================================
 def viz_segmentation_pairs(X, Y, Y2=None, colormap=None, gridshape=(2,8), saveto=None):
-    """
-
+    """ Given a batch of input images, and corresponding labels (and optionaly)
+        a second set of labes (eg, predictions), it creates a grid, of
+        image and label pairs/triplets, such that a [2,4] grid would look like:
+            [ x ][ x ][ x ][ x ]
+            [ y ][ y ][ y ][ y ]
+            [ y2][ y2][ y2][ y2]
+            [ x ][ x ][ x ][ x ]
+            [ y ][ y ][ y ][ y ]
+            [ y2][ y2][ y2][ y2]
+    Args:
+        X:          (numpy array) Batch of input images
+        Y:          (numpy array) Batch of corresponding labels, of shape
+                                  [n_batch, img_height, img_width]
+                                  Each pixel value should be a class label for
+                                  that pixel.
+        Y2:         (numpy array) An optional second label, eg for predictions.
+        colormap:   (numpy array) Each element contains the RGB 3-tuple that
+                                  the corresponding class id maps to.
+                                  eg: [(0,0,0), (255,0,0), (0,0,255)]
+        gridshape:  (2-tuple)     (rows, cols)
+        saveto:     (str or None) Where to save the visualization as an image.         
     """
     assert (X.ndim == 3) or (X.ndim == 4 and X.shape[-1] in {1,3}), "X is wrong dimensions"
     assert (Y.ndim == 3), "Y is wrong dimensions"
