@@ -1,3 +1,18 @@
+import tensorflow as tf
+
+# Convenient layer operation shortcuts
+fc = tf.contrib.layers.fully_connected
+conv = tf.contrib.layers.conv2d
+# convsep = tf.contrib.layers.separable_conv2d
+deconv = tf.contrib.layers.conv2d_transpose
+relu = tf.nn.relu
+maxpool = tf.contrib.layers.max_pool2d
+dropout_layer = tf.layers.dropout
+batchnorm = tf.contrib.layers.batch_norm
+winit = tf.contrib.layers.xavier_initializer()
+repeat = tf.contrib.layers.repeat
+arg_scope = tf.contrib.framework.arg_scope
+
 
 # ==============================================================================
 #                                                               GET_VGG_ARGSCOPE
