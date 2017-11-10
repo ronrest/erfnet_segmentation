@@ -32,8 +32,10 @@ def get_conv_arg_scope(is_training, bn=True, reg=None, use_deconv=False, use_rel
         return scope
 
 
-def factorized_res_module(x, is_training, dropout=0.3, dilation=[1,1], name="fres"):
     with arg_scope(get_conv_arg_scope(is_training=is_training, bn=True)):
+def factorized_res_module(x, is_training, dropout=0.3, dilation=[1,1], l2=None, name="fres"):
+    reg = None if l2 is None else l2_regularizer(l2)
+    with arg_scope(get_conv_arg_scope(reg=reg, is_training=is_training, bn=True)):
         with tf.variable_scope(name):
             n_filters = x.shape.as_list()[-1]
             y = conv(x, num_outputs=n_filters, kernel_size=[3,1], rate=dilation[0], normalizer_fn=None, scope="conv_a_3x1")
@@ -43,12 +45,14 @@ def factorized_res_module(x, is_training, dropout=0.3, dilation=[1,1], name="fre
             y = dropout_layer(y, rate=dropout)
             y = tf.add(x,y, name="add")
     print("DEBUG: {} {}".format(name, y.shape.as_list()))
+    print("DEBUG: L2 in factorized res module {}".format(l2))
     return y
 
 
-def downsample(x, n_filters, is_training, bn=False, use_relu=False, name="down"):
+def downsample(x, n_filters, is_training, bn=False, use_relu=False, l2=None, name="down"):
     with tf.variable_scope(name):
-        with arg_scope(get_conv_arg_scope(is_training=is_training, bn=bn, use_relu=use_relu)):
+        reg = None if l2 is None else l2_regularizer(l2)
+        with arg_scope(get_conv_arg_scope(reg=reg, is_training=is_training, bn=bn, use_relu=use_relu)):
             n_filters_in = x.shape.as_list()[-1]
             n_filters_conv = n_filters - n_filters_in
             branch_a = conv(x, num_outputs=n_filters_conv, kernel_size=3, stride=2, scope="conv")
@@ -57,8 +61,9 @@ def downsample(x, n_filters, is_training, bn=False, use_relu=False, name="down")
     print("DEBUG: {} {}".format(name, y.shape.as_list()))
     return y
 
-def upsample(x, n_filters, is_training=False, use_relu=False, bn=False, name="up"):
-    with arg_scope(get_conv_arg_scope(is_training=is_training, bn=bn, use_deconv=True, use_relu=use_relu)):
+def upsample(x, n_filters, is_training=False, use_relu=False, bn=False, l2=None, name="up"):
+    reg = None if l2 is None else l2_regularizer(l2)
+    with arg_scope(get_conv_arg_scope(reg=reg, is_training=is_training, bn=bn, use_deconv=True, use_relu=use_relu)):
         y = deconv(x, num_outputs=n_filters, kernel_size=4, stride=2, scope=name)
     print("DEBUG: {} {}".format(name, y.shape.as_list()))
     return y
