@@ -140,20 +140,11 @@ class ImageClassificationModel(object):
         self.initialize_evals_dict(self.evals_dict_keys)
         self.global_epoch = self.evals["global_epoch"]
 
-    def create_graph(self):
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self.create_input_ops()
-            self.create_body_ops()
-            self.create_preds_op()
-            self.create_loss_ops()
-            self.create_optimization_ops()
-            self.create_evaluation_metric_ops()
-            self.create_saver_ops()
-            self.create_tensorboard_ops()
+    def create_graph(self, logits_func=None):
+        """ Creates the graph.
 
-    def create_graph_from_logits_func(self, logits_func):
-        """ Given a logits function with the following API:
+            If a logits function is passed, then it should have the the
+            following API:
 
                 `logits_func(X, Y, n_classes, alpha, dropout, l2, is_training)`
                 Returning: `logits`
@@ -168,7 +159,10 @@ class ImageClassificationModel(object):
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.create_input_ops()
-            self.logits = logits_func(X=self.X, Y=self.Y, n_classes=self.n_classes, alpha=self.alpha, dropout=self.dropout, l2=self.l2_scale, is_training=self.is_training)
+            if logits_func is not None:
+                self.logits = logits_func(X=self.X, Y=self.Y, n_classes=self.n_classes, alpha=self.alpha, dropout=self.dropout, l2=self.l2_scale, is_training=self.is_training)
+            else:
+                self.create_body_ops()
             self.create_preds_op()
             self.create_loss_ops()
             self.create_optimization_ops()
