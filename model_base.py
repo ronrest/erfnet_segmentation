@@ -140,7 +140,7 @@ class ImageClassificationModel(object):
         self.initialize_evals_dict(self.evals_dict_keys)
         self.global_epoch = self.evals["global_epoch"]
 
-    def create_graph(self, logits_func=None):
+    def create_graph(self, logits_func=None, verbose=True):
         """ Creates the graph.
 
             If a logits function is passed, then it should have the the
@@ -170,6 +170,9 @@ class ImageClassificationModel(object):
             self.create_saver_ops()
             self.create_tensorboard_ops()
 
+        if verbose:
+            self.print_model_summary()
+        
     def create_input_ops(self):
         # TODO: This handling of L2 is ugly, fix it.
         if self.l2 is None:
@@ -301,6 +304,19 @@ class ImageClassificationModel(object):
             # REMAINDER INITIALIZER - all others not handled by pretrained snapshot
             self.remainder_vars = tf.contrib.framework.get_variables_to_restore(exclude=[var.name for var in self.pretrained_vars])
             self.remainder_initializer = tf.variables_initializer(var_list=self.remainder_vars)
+
+    def print_model_summary(self):
+        print("MODEL PARAMETERS")
+        template = "- {name:<30}:  {params: 8d} parameters. {shape}"
+        total_params = 0
+        with self.graph.as_default():
+            vars = tf.trainable_variables()
+            for var in vars:
+                shape = var.shape.as_list()
+                n_params = np.prod(shape)
+                total_params += n_params
+                print(template.format(name=var.name, params=n_params, shape=shape))
+        print("- TOTAL PARAMETERS:", total_params)
 
     def create_directory_structure(self):
         """ Ensure the necessary directory structure exists for saving this model """
