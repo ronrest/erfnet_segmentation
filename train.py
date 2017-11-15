@@ -19,9 +19,9 @@ __version__ = "2.0"
 # ##############################################################################
 #                                                                   AUGMENTATION
 # ##############################################################################
-from image_processing import create_augmentation_func
+from image_processing import create_augmentation_func, create_augmentation_func_for_segmentation
 
-aug_func = create_augmentation_func(
+aug_func = create_augmentation_func_for_segmentation(
     shadow=(0.01, 0.8),
     shadow_file="shadow_pattern.jpg",
     shadow_crop_range=(0.02, 0.5),
