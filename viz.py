@@ -84,7 +84,6 @@ def batch2grid(imgs, rows, cols):
     # Prepare dimensions of the grid
     n_cells = (rows*cols)
     imgs = imgs[:n_cells] # Only use the number of images needed to fill grid
-    n_samples, img_height, img_width, n_channels = imgs.shape
 
     # Image dimensions
     n_dims = imgs.ndim
@@ -93,6 +92,9 @@ def batch2grid(imgs, rows, cols):
     # Deal with images that have no color channel
     if n_dims == 3:
         imgs = np.expand_dims(imgs, axis=3)
+
+    # get dimensions of image
+    n_samples, img_height, img_width, n_channels = imgs.shape
 
     # Handle case where there is not enough images in batch to fill grid
     if n_cells > n_samples:
