@@ -285,11 +285,8 @@ def viz_segmentation_label(label, colormap=None, saveto=None):
     if colormap is None:
         colormap = [[0,0,0], [255,79,64], [115,173,33],[48,126,199]]
 
-    # Map each pixel label to a color
-    label_viz = np.zeros((label.shape[0],label.shape[1],3), dtype=np.uint8)
-    uids = np.unique(label)
-    for uid in uids:
-        label_viz[label==uid] = colormap[uid]
+    # Convert label image to RGB image based on colormap
+    label_viz = np.array(colormap).astype(np.uint8)[label]
 
     # Convert to PIL image
     label_viz = PIL.Image.fromarray(label_viz)
@@ -452,7 +449,7 @@ def viz_segmentation_pairs(X, Y, Y2=None, colormap=None, gridshape=(2,8), saveto
                                   the corresponding class id maps to.
                                   eg: [(0,0,0), (255,0,0), (0,0,255)]
         gridshape:  (2-tuple)     (rows, cols)
-        saveto:     (str or None) Where to save the visualization as an image.         
+        saveto:     (str or None) Where to save the visualization as an image.
     """
     assert (X.ndim == 3) or (X.ndim == 4 and X.shape[-1] in {1,3}), "X is wrong dimensions"
     assert (Y.ndim == 3), "Y is wrong dimensions"
