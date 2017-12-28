@@ -32,7 +32,20 @@ def get_conv_arg_scope(is_training, bn=True, reg=None, use_deconv=False, use_rel
         return scope
 
 
+def factorized_res_moduleOLD(x, is_training, dropout=0.3, dilation=1, name="fres"):
     with arg_scope(get_conv_arg_scope(is_training=is_training, bn=True)):
+        with tf.variable_scope(name):
+            n_filters = x.shape.as_list()[-1]
+            y = conv(x, num_outputs=n_filters, kernel_size=[3,1], normalizer_fn=None, scope="conv_a_3x1")
+            y = conv(y, num_outputs=n_filters, kernel_size=[1,3], scope="conv_a_1x3")
+            y = conv(y, num_outputs=n_filters, kernel_size=[3,1], rate=dilation, normalizer_fn=None, scope="conv_b_3x1")
+            y = conv(y, num_outputs=n_filters, kernel_size=[1,3], rate=dilation, scope="conv_b_1x3")
+            y = dropout_layer(y, rate=dropout)
+            y = tf.add(x,y, name="add")
+    print("DEBUG: {} {}".format(name, y.shape.as_list()))
+    return y
+
+
 def factorized_res_module(x, is_training, dropout=0.3, dilation=[1,1], l2=None, name="fres"):
     reg = None if l2 is None else l2_regularizer(l2)
     with arg_scope(get_conv_arg_scope(reg=reg, is_training=is_training, bn=True)):
@@ -61,12 +74,55 @@ def downsample(x, n_filters, is_training, bn=False, use_relu=False, l2=None, nam
     print("DEBUG: {} {}".format(name, y.shape.as_list()))
     return y
 
+
 def upsample(x, n_filters, is_training=False, use_relu=False, bn=False, l2=None, name="up"):
     reg = None if l2 is None else l2_regularizer(l2)
     with arg_scope(get_conv_arg_scope(reg=reg, is_training=is_training, bn=bn, use_deconv=True, use_relu=use_relu)):
         y = deconv(x, num_outputs=n_filters, kernel_size=4, stride=2, scope=name)
     print("DEBUG: {} {}".format(name, y.shape.as_list()))
     return y
+
+
+def romeranetB_logits(X, Y, n_classes, alpha=0.001, dropout=0.3, l2=None, is_training=False):
+    """
+    """
+    # TODO: Use TF repeat for some of these repeating layers
+    # TODO: register factorized_res_module and upsample and downsample with arg_scope
+    #       and pass dropout, is_training, etc to it.
+    # TODO: Add weight decay.
+    with tf.name_scope("preprocess") as scope:
+        x = tf.div(X, 255., name="rescaled_inputs")
+
+    x = downsample(x, n_filters=16, is_training=is_training, name="d1")
+
+    x = downsample(x, n_filters=64, is_training=is_training, name="d2")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres3")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres4")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres5")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres6")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres7")
+
+    # TODO: Use dilated convolutions
+    x = downsample(x, n_filters=128, is_training=is_training, name="d8")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=2, name="fres9")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=4, name="fres10")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=8, name="fres11")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=16, name="fres12")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=2, name="fres13")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=4, name="fres14")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=8, name="fres15")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=16, name="fres16")
+
+    x = upsample(x, n_filters=64, is_training=is_training, name="up17")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres18")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres19")
+
+    x = upsample(x, n_filters=16, is_training=is_training, name="up20")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres21")
+    x = factorized_res_moduleOLD(x, is_training=is_training, dilation=1, name="fres22")
+
+    x = upsample(x, n_filters=n_classes, is_training=is_training, name="up23")
+    return x
 
 
 def erfnetA(X, Y, n_classes, alpha=0.001, dropout=0.3, l2=None, is_training=False):
@@ -109,6 +165,8 @@ def erfnetA(X, Y, n_classes, alpha=0.001, dropout=0.3, l2=None, is_training=Fals
 
     x = upsample(x, n_filters=n_classes, is_training=is_training, name="up23")
     return x
+
+
 def erfnetB(X, Y, n_classes, alpha=0.001, dropout=0.3, l2=None, is_training=False):
     """
     Uses L2 regularization.
