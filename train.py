@@ -35,10 +35,9 @@ aug_func = create_augmentation_func_for_segmentation(
     noise=10
     )
 
-# # Visualize samples of augmentations
+# Visualize samples of augmentations
 # from viz import viz_sample_augmentations
-# viz_sample_augmentations(data["X_train"], aug_func=aug_func, n_images=10, n_per_image=5, saveto=None)
-
+# viz_sample_segmentation_augmentations(data["X_train"], data["Y_train"], colormap=data["colormap"], aug_func=aug_func, n_images=2, n_per_image=5, saveto="sample_augmentation_pairs.jpg")
 
 # ##############################################################################
 #                                                                           MAIN
