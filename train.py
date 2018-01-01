@@ -2,8 +2,6 @@ from __future__ import print_function, division, unicode_literals
 import numpy as np
 import tensorflow as tf
 
-# from model_base import ImageClassificationModel
-# from model_base import PretrainedImageClassificationModel
 from data_processing import prepare_data, calculate_class_weights
 from model_base import SegmentationModel
 
