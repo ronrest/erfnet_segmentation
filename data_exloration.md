@@ -5,12 +5,12 @@ The Cambridge-driving Labeled Video Database (CamVid) is a dataset that contains
 The input images are RGB png images with dimensions of `960x720`. Below is a sample of 20 images from the dataset.
 
 
-![sample of input images](sample_inputs.jpg)
+![sample of input images](ZZZ_IMAGES_DIR/sample_inputs.jpg)
 
 ## Labels
 The labels are also encoded as RGB PNG images, with each of the 32 semantic classes represented as a different RGB value.
 
-![Sample of label images](sample_labels.jpg)
+![Sample of label images](ZZZ_IMAGES_DIR/sample_labels.jpg)
 
 The mapping of the different semantic classes is as follows:
 
@@ -150,7 +150,7 @@ The mapping of the different semantic classes is as follows:
 
 The distribution of how much of the image each class takes (as a  proportion of the number of pixels in the image) can be viewed in the following plot. We can see that buildings, roads, sky, and trees disproportionately dominate the scenes, and other classes occur with much less frequency.
 
-![Image of violin plot](violin_plot.jpg)
+![Image of violin plot](ZZZ_IMAGES_DIR/violin_plot.jpg)
 
 
 ## Data Preparation
@@ -187,7 +187,7 @@ The following data augmentation steps were taken:
 
 Below is an example of two training images (and their accompanying labels) with data augmentation applied to them five times.
 
-![Image of data augmentations](sample_augmentation_pairs.jpg)
+![Image of data augmentations](ZZZ_IMAGES_DIR/sample_augmentation_pairs.jpg)
 
 ### Class weighting
 Since the distribution of classes on the images is quite imbalanced, class weighting was used to allow the model to learn about objects that it rarely sees, or which take up smaller regions of the total image. The method used was is from [Paszke et al 2016][paszke2016]
