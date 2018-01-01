@@ -53,7 +53,8 @@ if __name__ == '__main__':
     n_classes = len(data["id2label"])
 
     # MODEL - ERFNet, with Paszke class weighting
-    model = SegmentationModel("aug_erfnetC_03", img_shape=[256,256], n_classes=len(data["id2label"]), l2=2e-4)
+    model_name = "aug_erfnetC_03"
+    model = SegmentationModel(model_name, img_shape=[256,256], n_classes=len(data["id2label"]), l2=2e-4)
     class_weights = calculate_class_weights(data["Y_train"], n_classes=n_classes, method="paszke", c=1.10)
     model.set_class_weights(class_weights)
     model.create_graph(erfnetB)
